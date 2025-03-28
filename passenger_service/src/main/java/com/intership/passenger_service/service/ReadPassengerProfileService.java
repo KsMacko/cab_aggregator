@@ -4,6 +4,7 @@ import com.intership.passenger_service.dto.ProfileDto;
 import com.intership.passenger_service.dto.mapper.ProfileMapper;
 import com.intership.passenger_service.entity.PassengerProfile;
 import com.intership.passenger_service.repo.PassengerProfileRepo;
+import com.intership.passenger_service.repo.RateRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReadPassengerProfileService {
     private final PassengerProfileRepo passengerProfileRepo;
+    private final RateRepo rateRepo;
 
     public ProfileDto readPassengerProfile(Long id) {
         PassengerProfile passengerProfile =  passengerProfileRepo.findById(id).orElseThrow();
@@ -30,12 +32,12 @@ public class ReadPassengerProfileService {
         return passengerProfileRepo.findAll()
                 .stream().map(ProfileMapper.convertor::handleEntity).toList();
     }
-    public List<ProfileDto> readPassengersProfilesByRating(Byte rate) {
-        return passengerProfileRepo.findAllByRate(rate)
-                .stream().map(ProfileMapper.convertor::handleEntity).toList();
+    public Byte readPassengerRating(Long passengerId) {
+        return rateRepo.findPassengerRatingByProfileId(passengerId);
     }
-    public Long readActivatedPromoCodeByPassenger(Long passengerId) {
-        return passengerProfileRepo.findActivatedPromoCodeIdByPassenger(passengerId).orElseThrow();
+    public List<ProfileDto> readPassengersProfilesByRating(Byte rate) {
+        return passengerProfileRepo.findPassengerProfileByRate(rate)
+                .stream().map(ProfileMapper.convertor::handleEntity).toList();
     }
 
 

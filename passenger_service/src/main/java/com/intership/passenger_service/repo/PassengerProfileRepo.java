@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PassengerProfileRepo extends JpaRepository<PassengerProfile, Long> {
-    List<PassengerProfile> findAllByRate(Byte rate);
+    @Query("select p from PassengerProfile p join p.rates r group by p.profileId having floor(avg(r.value))=:rate")
+    List<PassengerProfile> findPassengerProfileByRate(Byte rate);
     Optional<PassengerProfile> findByEmail(String email);
     Optional<PassengerProfile> findByPhone(String phone);
     @Query("SELECT p.activatedPromoCodeId FROM PassengerProfile p WHERE p.profileId = :passengerId")

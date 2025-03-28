@@ -8,34 +8,33 @@ import com.intership.passenger_service.repo.PassengerProfileRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class CommandPassengerProfileService {
     private final PassengerProfileRepo passengerProfileRepo;
     private final PassengerAccountRepo passengerAccountRepo;
 
-     public void createNewPassengerProfile(ProfileDto profileDto) {
+     public ProfileDto createNewPassengerProfile(ProfileDto profileDto) {
          PassengerProfile passengerProfile = ProfileMapper.convertor.handleDto(profileDto);
-         passengerProfileRepo.save(passengerProfile);
+         return ProfileMapper.convertor.handleEntity(passengerProfileRepo.save(passengerProfile));
      }
-     public void updatePassengerProfile(ProfileDto profileDto) {
-         if(profileDto.getProfileId()!=null){
-             Optional<PassengerProfile> passengerProfile = passengerProfileRepo.findById(profileDto.getProfileId());
-             passengerProfile.ifPresent(profile -> {
-                 if(profileDto.getFirstName()!=null)
-                     profile.setFirstName(profileDto.getFirstName());
-                 if(profileDto.getPhone()!=null)
-                     profile.setPhone(profileDto.getPhone());
-                 if(profileDto.getEmail()!=null)
-                     profile.setEmail(profileDto.getEmail());
-                 if(profileDto.getRate()!=null)
-                     profile.setRate(profileDto.getRate());
-                 passengerProfileRepo.save(profile);
-             });
-         }
-     }
+    public ProfileDto updatePassengerProfile(ProfileDto profileDto) {
+        if (profileDto.getProfileId() != null) {
+            return passengerProfileRepo.findById(profileDto.getProfileId())
+                    .map(profile -> {
+                        if (profileDto.getFirstName() != null)
+                            profile.setFirstName(profileDto.getFirstName());
+                        if (profileDto.getPhone() != null)
+                            profile.setPhone(profileDto.getPhone());
+                        if (profileDto.getEmail() != null)
+                            profile.setEmail(profileDto.getEmail());
+
+                        return ProfileMapper.convertor.handleEntity(passengerProfileRepo.save(profile));
+                    })
+                    .orElse(profileDto);
+        }
+        return profileDto;
+    }
      public void deletePassengerProfile(Long profileId) {
          passengerAccountRepo.deleteById(profileId);
          passengerProfileRepo.deleteById(profileId);
