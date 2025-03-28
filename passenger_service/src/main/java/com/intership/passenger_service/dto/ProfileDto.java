@@ -14,5 +14,5 @@ public class ProfileDto {
     private String firstName;
     private String email;
     private String phone;
-    private Float rate;
+    private Byte rate;
 }

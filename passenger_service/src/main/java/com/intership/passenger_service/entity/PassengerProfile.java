@@ -28,7 +28,7 @@ public class PassengerProfile {
     @Column(nullable = false, unique = true)
     private String phone;
     @Column(nullable = false)
-    private Float rate;
+    private Byte rate;
     private Long activatedPromoCodeId;
 
     @OneToOne
