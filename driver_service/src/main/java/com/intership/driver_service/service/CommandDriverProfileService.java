@@ -42,7 +42,7 @@ public class CommandDriverProfileService {
         }
         return profileDto;
     }
-    public void deletePassengerProfile(Long profileId) {
+    public void deleteDriverProfile(Long profileId) {
         driverAccountRepo.deleteById(profileId);
         driverProfileRepo.deleteById(profileId);
     }

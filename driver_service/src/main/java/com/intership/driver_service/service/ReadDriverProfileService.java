@@ -48,11 +48,11 @@ public class ReadDriverProfileService {
                         createSortBy(sortBy,order))
                 .stream().map(ProfileMapper.converter::handleEntity).toList();
     }
-    public String readDriverProfileFareTypeById(Long driverId) {
-        return driverProfileRepo.getFareTypeByProfileId(driverId).toString();
+    public FareType readDriverProfileFareTypeById(Long driverId) {
+        return driverProfileRepo.getFareTypeByProfileId(driverId);
     }
-    public String readDriverProfileStatusById(Long driverId) {
-        return driverProfileRepo.getDriverStatusByProfileId(driverId).toString();
+    public DriverStatus readDriverProfileStatusById(Long driverId) {
+        return driverProfileRepo.getDriverStatusByProfileId(driverId);
     }
     public Byte readDriverProfileRatingById(Long driverId) {
         return rateRepo.findDriverRatingByProfileId(driverId);
