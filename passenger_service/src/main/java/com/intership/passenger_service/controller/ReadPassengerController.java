@@ -1,5 +1,6 @@
 package com.intership.passenger_service.controller;
 
+import com.intership.passenger_service.dto.DataPackageDto;
 import com.intership.passenger_service.dto.ProfileDto;
 import com.intership.passenger_service.service.ReadPassengerProfileService;
 import lombok.RequiredArgsConstructor;
@@ -9,39 +10,45 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 @RestController
-@RequestMapping("api/passenger")
+@RequestMapping("api/v1/passengers")
 @RequiredArgsConstructor
 public class ReadPassengerController {
     private final ReadPassengerProfileService profileService;
 
-    @GetMapping("/all-passengers")
-    public List<ProfileDto> readAll() {
-        return profileService.readPassengersProfiles();
+    @GetMapping
+    public DataPackageDto readAll(
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "ASC") String direction,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return profileService.readPassengersProfiles(page, size, sortBy, direction);
     }
-    @GetMapping("/by-id/{id}")
+    @GetMapping("/{id}")
     public ProfileDto readPassengerById(@PathVariable("id") Long id) {
         return profileService.readPassengerProfile(id);
     }
-    @GetMapping("/by-email")
+    @GetMapping(params = "email")
     public ProfileDto readByEmail(@RequestParam("email") String email) {
         return profileService.readPassengerProfileByEmail(email);
     }
-    @GetMapping("/by-phone")
+    @GetMapping(params = "phone")
     public ProfileDto readByPhone(@RequestParam("phone") String phone) {
         return profileService.readPassengerProfileByPhone(phone);
     }
-    @GetMapping("/rating/{profile_id}")
-    public Byte readRating(@PathVariable("profile_id") Long profileId) {
+    @GetMapping("/{id}/rates")
+    public Byte readRating(@PathVariable("id") Long profileId) {
         return profileService.readPassengerRating(profileId);
     }
-    @GetMapping("/all-by-rating/{rate}")
-    public List<ProfileDto> readRating(@PathVariable("rate") Byte rate) {
-        return profileService.readPassengersProfilesByRating(rate);
+    @GetMapping(params = "rate")
+    public DataPackageDto readByRating(
+            @RequestParam("rate") Byte rate,
+            @RequestParam(defaultValue = "firstName") String sortBy,
+            @RequestParam(defaultValue = "ASC") String direction,
+            @RequestParam int page,
+            @RequestParam int size) {
+        return profileService.readPassengersProfilesByRating(rate, page, size, sortBy, direction);
     }
-
-
-
 }

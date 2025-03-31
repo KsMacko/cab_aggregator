@@ -1,18 +1,13 @@
 package com.intership.passenger_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class ProfileDto {
-    private Long profileId;
-    private String firstName;
-    private String email;
-    private String phone;
-    private Byte rate;
-}
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record ProfileDto (
+    Long profileId,
+    String firstName,
+    String email,
+    String phone,
+    @Schema(type = "integer", format = "int32")
+    Byte rate
+){}

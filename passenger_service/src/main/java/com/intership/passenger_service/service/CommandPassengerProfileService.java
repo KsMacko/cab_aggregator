@@ -5,6 +5,7 @@ import com.intership.passenger_service.dto.mapper.ProfileMapper;
 import com.intership.passenger_service.entity.PassengerProfile;
 import com.intership.passenger_service.repo.PassengerAccountRepo;
 import com.intership.passenger_service.repo.PassengerProfileRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,28 +14,23 @@ import org.springframework.stereotype.Service;
 public class CommandPassengerProfileService {
     private final PassengerProfileRepo passengerProfileRepo;
     private final PassengerAccountRepo passengerAccountRepo;
-
+    @Transactional
      public ProfileDto createNewPassengerProfile(ProfileDto profileDto) {
-         PassengerProfile passengerProfile = ProfileMapper.convertor.handleDto(profileDto);
-         return ProfileMapper.convertor.handleEntity(passengerProfileRepo.save(passengerProfile));
+         PassengerProfile passengerProfile = ProfileMapper.converter.handleDto(profileDto);
+         return ProfileMapper.converter.handleEntity(passengerProfileRepo.save(passengerProfile));
      }
-    public ProfileDto updatePassengerProfile(ProfileDto profileDto) {
-        if (profileDto.getProfileId() != null) {
-            return passengerProfileRepo.findById(profileDto.getProfileId())
-                    .map(profile -> {
-                        if (profileDto.getFirstName() != null)
-                            profile.setFirstName(profileDto.getFirstName());
-                        if (profileDto.getPhone() != null)
-                            profile.setPhone(profileDto.getPhone());
-                        if (profileDto.getEmail() != null)
-                            profile.setEmail(profileDto.getEmail());
+     @Transactional
+     public ProfileDto updatePassengerProfile(ProfileDto profileDto) {
+         if (profileDto.profileId() == null) {
+             throw new IllegalArgumentException("Passenger ID must not be null");
+         }
+         PassengerProfile existingProfile = passengerProfileRepo.findById(profileDto.profileId())
+                 .orElseThrow(() -> new RuntimeException("Passenger not found"));
+         ProfileMapper.converter.updateProfileFromDto(profileDto, existingProfile);
 
-                        return ProfileMapper.convertor.handleEntity(passengerProfileRepo.save(profile));
-                    })
-                    .orElse(profileDto);
-        }
-        return profileDto;
+         return ProfileMapper.converter.handleEntity( passengerProfileRepo.save(existingProfile));
     }
+    @Transactional
      public void deletePassengerProfile(Long profileId) {
          passengerAccountRepo.deleteById(profileId);
          passengerProfileRepo.deleteById(profileId);
