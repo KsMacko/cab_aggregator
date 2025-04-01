@@ -15,12 +15,6 @@
     <properties>
         <java.version>17</java.version>
     </properties>
-    <scm>
-        <connection>scm:git:${project.scm.url}</connection>
-        <developerConnection>scm:git:${project.scm.url}</developerConnection>
-        <url>https://github.com/liquibase/liquibase-mongodb.git</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <dependencies>
         <dependency>

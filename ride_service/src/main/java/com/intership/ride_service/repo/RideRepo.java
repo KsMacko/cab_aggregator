@@ -5,6 +5,8 @@ import com.intership.ride_service.entity.enums.FareType;
 import com.intership.ride_service.entity.enums.RideStatus;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -13,10 +15,10 @@ import java.util.List;
 
 public interface RideRepo extends MongoRepository<Ride, String> {
 
-    List<Ride> findByDate(LocalDate date, Sort sort);
-    List<Ride> findByDriverDriverId(Long driverId, Sort sort);
-    List<Ride> findByPassengerPassengerId(Long passengerId, Sort sort);
-    List<Ride> findByStatus(RideStatus status, Sort sort);
-    List<Ride> findByDriverFareType(FareType fareType, Sort sort);
-    List<Ride> findByPromoCodeIsNotNull(Sort sort);
+    Page<Ride> findByDate(LocalDate date, Pageable pageable);
+    Page<Ride> findByDriverDriverId(Long driverId, Pageable pageable);
+    Page<Ride> findByPassengerPassengerId(Long passengerId, Pageable pageable);
+    Page<Ride> findByStatus(RideStatus status,Pageable pageable);
+    Page<Ride> findByDriverFareType(FareType fareType, Pageable pageable);
+    Page<Ride> findByPromoCodeIsNotNull(Pageable pageable);
 }

@@ -10,21 +10,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-@Getter
-@Setter
-public class RideDto {
-    private String id;
-    private PassengerDto passenger;
-    private DriverDto driver;
-    private PromoCodeDto promoCode;
-    private String startLocation;
-    private List<String> endLocation;
-    private LocalDate date;
+public record RideDto (
+    String id,
+    PassengerDto passenger,
+    DriverDto driver,
+    PromoCodeDto promoCode,
+    String startLocation,
+    List<String> endLocation,
+    LocalDate date,
     @Schema(type = "string", example = "12:30")
-    private LocalTime startTime;
+    LocalTime startTime,
     @Schema(type = "string", example = "12:30")
-    private LocalTime endTime;
-    private Integer distance;
-    private RideStatus status;
-    private BigDecimal price;
-}
+    LocalTime endTime,
+    Integer distance,
+    RideStatus status,
+    BigDecimal price
+    ){}

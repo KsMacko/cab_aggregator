@@ -1,7 +1,9 @@
 package com.intership.ride_service.service;
 
 import com.intership.ride_service.dto.PromoCodeDto;
+import com.intership.ride_service.dto.PromoCodePackageDto;
 import com.intership.ride_service.dto.RideDto;
+import com.intership.ride_service.dto.RidePackageDto;
 import com.intership.ride_service.dto.mappers.PromoCodeMapper;
 import com.intership.ride_service.dto.mappers.RideMapper;
 import com.intership.ride_service.entity.Ride;
@@ -9,6 +11,9 @@ import com.intership.ride_service.entity.enums.FareType;
 import com.intership.ride_service.entity.enums.RideStatus;
 import com.intership.ride_service.repo.RideRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -22,56 +27,67 @@ public class ReadRideService {
     private final RideRepo rideRepo;
 
     public RideDto getRideById(String id) {
-        Ride ride = rideRepo.findById(id)
+        Ride ride = rideRepo
+                .findById(id)
                 .orElseThrow(() -> new RuntimeException("Ride not found"));
         return RideMapper.converter.handleEntity(ride);
     }
 
-    public List<RideDto> getAllRidesByDate(LocalDate date, String sortBy, String order) {
-        Sort sort = createSort(sortBy, order);
-        return rideRepo.findByDate(date, sort).stream()
-                .map(RideMapper.converter::handleEntity)
-                .toList();
+    public RidePackageDto getAllRidesByDate(LocalDate date, int page, int size,String sortBy, String direction) {
+        Page<Ride> rides = rideRepo.findByDate(date, createPageableObject(page, size, sortBy, direction));
+        return createRidePackage(rides);
     }
 
-    public List<RideDto> getAllRidesByDriver(Long driverId, String sortBy, String order) {
-        Sort sort = createSort(sortBy, order);
-        return rideRepo.findByDriverDriverId(driverId, sort).stream()
-                .map(RideMapper.converter::handleEntity)
-                .toList();
+    public RidePackageDto getAllRidesByDriver(Long driverId, int page, int size,String sortBy, String order) {
+        Page<Ride> rides = rideRepo.findByDriverDriverId(driverId, createPageableObject(page, size, sortBy, order));
+        return createRidePackage(rides);
     }
 
-    public List<RideDto> getAllRidesByPassenger(Long passengerId, String sortBy, String order) {
-        Sort sort = createSort(sortBy, order);
-        return rideRepo.findByPassengerPassengerId(passengerId, sort).stream()
-                .map(RideMapper.converter::handleEntity)
-                .toList();
+    public RidePackageDto getAllRidesByPassenger(Long passengerId, int page, int size,String sortBy, String order) {
+        Page<Ride> rides = rideRepo.findByPassengerPassengerId(passengerId, createPageableObject(page, size, sortBy, order));
+        return createRidePackage(rides);
     }
 
-    public List<RideDto> getAllRidesByStatus(RideStatus status, String sortBy, String order) {
-        Sort sort = createSort(sortBy, order);
-        return rideRepo.findByStatus(status, sort).stream()
-                .map(RideMapper.converter::handleEntity)
-                .toList();
+    public RidePackageDto getAllRidesByStatus(RideStatus status, int page, int size, String sortBy, String order) {
+        Page<Ride> rides = rideRepo.findByStatus(status, createPageableObject(page, size, sortBy, order));
+        return createRidePackage(rides);
     }
 
-    public List<RideDto> getAllRidesByFareType(FareType fareType, String sortBy, String order) {
-        Sort sort = createSort(sortBy, order);
-        return rideRepo.findByDriverFareType(fareType, sort).stream()
-                .map(RideMapper.converter::handleEntity)
-                .toList();
+    public RidePackageDto getAllRidesByFareType(FareType fareType,int page, int size, String sortBy, String order) {
+        Page<Ride> rides = rideRepo.findByDriverFareType(fareType, createPageableObject(page, size, sortBy, order));
+        return createRidePackage(rides);
     }
 
-    public List<PromoCodeDto> getUsedPromoCodes(String sortBy, String order) {
-        Sort sort = createSort(sortBy, order);
-        return rideRepo.findByPromoCodeIsNotNull(sort).stream()
-                .filter(ride -> ride.getPromoCode() != null)
+    public PromoCodePackageDto getUsedPromoCodes(int page, int size, String sortBy, String order) {
+        Page<Ride> rides = rideRepo.findByPromoCodeIsNotNull(createPageableObject(page, size, sortBy, order));
+        List<PromoCodeDto> promoCodesDto = rides.getContent()
+                .stream()
                 .map(ride -> PromoCodeMapper.converter.handleEntity(ride.getPromoCode()))
                 .toList();
+        return new PromoCodePackageDto(
+                promoCodesDto,
+                rides.getTotalElements(),
+                rides.getNumber(),
+                rides.getSize(),
+                rides.getTotalPages()
+        );
     }
 
-    public Sort createSort(String orderBy, String direction) {
-        Sort.Direction direct = Sort.Direction.fromString(direction);
-        return Sort.by(direct, orderBy);
+    public Pageable createPageableObject(int page, int size, String orderBy, String direction) {
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
+        return PageRequest.of(page, size, sort);
+    }
+    public RidePackageDto createRidePackage(Page<Ride> rides) {
+        List<RideDto> ridesDto = rides.getContent()
+                .stream()
+                .map(RideMapper.converter::handleEntity)
+                .toList();
+        return new RidePackageDto(
+                ridesDto,
+                rides.getTotalElements(),
+                rides.getNumber(),
+                rides.getSize(),
+                rides.getTotalPages()
+        );
     }
 }
