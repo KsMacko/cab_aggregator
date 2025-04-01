@@ -1,12 +1,17 @@
 package com.intership.driver_service.service;
 
+import com.intership.driver_service.dto.DataPackageDto;
 import com.intership.driver_service.dto.ProfileDto;
 import com.intership.driver_service.dto.mapper.ProfileMapper;
+import com.intership.driver_service.entity.DriverProfile;
 import com.intership.driver_service.enums.DriverStatus;
 import com.intership.driver_service.enums.FareType;
 import com.intership.driver_service.repo.DriverProfileRepo;
 import com.intership.driver_service.repo.RateRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +27,10 @@ public class ReadDriverProfileService {
         return ProfileMapper.converter.handleEntity(
                 driverProfileRepo.findById(driverId).orElseThrow());
     }
-    public List<ProfileDto> readAllDriverProfiles(String sortBy, String order) {
-
-        return driverProfileRepo.findAll(
-                createSortBy(sortBy, order))
-                .stream().map(ProfileMapper.converter::handleEntity).toList();
+    public DataPackageDto readAllDriverProfiles(int page, int size, String sortBy, String direction) {
+        Page<DriverProfile> driverProfilePage = driverProfileRepo.findAll(
+                createPageableObject(page, size, sortBy, direction));
+        return createDataPackageDto(driverProfilePage);
     }
     public ProfileDto readDriverProfileByPhone(String phone) {
         return ProfileMapper.converter.handleEntity(
@@ -36,17 +40,25 @@ public class ReadDriverProfileService {
         return ProfileMapper.converter.handleEntity(
                 driverProfileRepo.findDriverProfileByCarNumber(carNumber));
     }
-    public List<ProfileDto> readDriverProfilesByFareRate(String fareType, String sortBy, String order) {
-        return  driverProfileRepo.findAllByFareType(
+    public DataPackageDto readDriverProfilesByFareRate(String fareType,
+                                                       int page,
+                                                       int size,
+                                                       String sortBy,
+                                                       String direction) {
+        Page<DriverProfile> driverProfilePage = driverProfileRepo.findAllByFareType(
                 FareType.valueOf(fareType),
-                        createSortBy(sortBy,order))
-                .stream().map(ProfileMapper.converter::handleEntity).toList();
+                createPageableObject(page,size, sortBy, direction));
+        return  createDataPackageDto(driverProfilePage);
     }
-    public List<ProfileDto> readDriverProfilesByDriverStatus(String driverStatus, String sortBy, String order) {
-        return  driverProfileRepo.findAllByDriverStatus(
-                        DriverStatus.valueOf(driverStatus),
-                        createSortBy(sortBy,order))
-                .stream().map(ProfileMapper.converter::handleEntity).toList();
+    public DataPackageDto readDriverProfilesByDriverStatus(String driverStatus,
+                                                           int page,
+                                                           int size,
+                                                           String sortBy,
+                                                           String direction) {
+        Page<DriverProfile> driverProfilePage = driverProfileRepo.findAllByDriverStatus(
+                DriverStatus.valueOf(driverStatus),
+                createPageableObject(page, size, sortBy, direction));
+        return  createDataPackageDto(driverProfilePage);
     }
     public FareType readDriverProfileFareTypeById(Long driverId) {
         return driverProfileRepo.getFareTypeByProfileId(driverId);
@@ -57,15 +69,32 @@ public class ReadDriverProfileService {
     public Byte readDriverProfileRatingById(Long driverId) {
         return rateRepo.findDriverRatingByProfileId(driverId);
     }
-    public List<ProfileDto> readDriverProfilesByRate(Byte rate, String sortBy, String order) {
-        return driverProfileRepo.findDriverProfileByRate(
-                rate,createSortBy(sortBy,order))
-                .stream().map(ProfileMapper.converter::handleEntity).toList();
+    public DataPackageDto readDriverProfilesByRate(Byte rate,
+                                                     int page,
+                                                     int size,
+                                                     String sortBy,
+                                                     String direction) {
+        Page<DriverProfile> driverProfilePage = driverProfileRepo.findDriverProfileByRate(rate,
+                createPageableObject(page, size, sortBy, direction));
+        return createDataPackageDto(driverProfilePage);
     }
 
-    public Sort createSortBy(String sortBy, String order) {
-        Sort.Direction sortDirection = Sort.Direction.fromString(order);
-        return Sort.by(sortDirection, sortBy);
+    public Pageable createPageableObject(int page, int size, String sortBy, String direction) {
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+        return PageRequest.of(page, size, sort);
+    }
+    public DataPackageDto createDataPackageDto(Page<DriverProfile> driverProfilePage){
+        List<ProfileDto> driverProfilesDto = driverProfilePage.getContent()
+                .stream()
+                .map(ProfileMapper.converter::handleEntity)
+                .toList();
+        return new DataPackageDto(
+                driverProfilesDto,
+                driverProfilePage.getTotalElements(),
+                driverProfilePage.getNumber(),
+                driverProfilePage.getSize(),
+                driverProfilePage.getTotalPages()
+        );
     }
 
 }

@@ -1,5 +1,6 @@
 package com.intership.driver_service.controller;
 
+import com.intership.driver_service.dto.DataPackageDto;
 import com.intership.driver_service.dto.ProfileDto;
 import com.intership.driver_service.enums.DriverStatus;
 import com.intership.driver_service.enums.FareType;
@@ -14,57 +15,56 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/driver")
+@RequestMapping("/api/v1/drivers")
 @RequiredArgsConstructor
 public class ReadDriverProfileController {
     private final ReadDriverProfileService readDriverProfileService;
 
-    @GetMapping("/read-all")
-    public List<ProfileDto> findAll(@RequestParam String orderBy,
-                                    @RequestParam String order) {
-        return readDriverProfileService.readAllDriverProfiles(orderBy, order);
+    @GetMapping
+    public DataPackageDto findAll(@RequestParam int page,
+                                  @RequestParam int size,
+                                  @RequestParam String orderBy,
+                                  @RequestParam String direction) {
+        return readDriverProfileService.readAllDriverProfiles(page, size, orderBy, direction);
     }
-    @GetMapping("/read-by-id/{id}")
+    @GetMapping("/{id}")
     public ProfileDto findById(@PathVariable Long id) {
         return readDriverProfileService.readDriverProfileById(id);
     }
-    @GetMapping("/read-by-phone")
+    @GetMapping(params = "phone")
     public ProfileDto findByPhone(@RequestParam String phone) {
         return readDriverProfileService.readDriverProfileByPhone(phone);
     }
-    @GetMapping("/read-by-car-number")
+    @GetMapping(params = "carNumber")
     public ProfileDto findByCarNumber(@RequestParam String carNumber) {
         return readDriverProfileService.readDriverProfileByCarNumber(carNumber);
     }
-    @GetMapping("/read-all-by-fare")
-    public List<ProfileDto> findAllByFareType(@RequestParam String fare,
-                                              @RequestParam String orderBy,
-                                              @RequestParam String order) {
-        return readDriverProfileService.readDriverProfilesByFareRate(fare, orderBy, order);
+    @GetMapping(params = "fare")
+    public DataPackageDto findAllByFareType(@RequestParam String fare,
+                                            @RequestParam int page,
+                                            @RequestParam int size,
+                                            @RequestParam String orderBy,
+                                            @RequestParam String direction) {
+        return readDriverProfileService.readDriverProfilesByFareRate(fare, page, size, orderBy, direction);
     }
-    @GetMapping("/read-all-by-status")
-    public List<ProfileDto> findAllByDriverStatus(@RequestParam String status,
-                                                  @RequestParam String orderBy,
-                                                  @RequestParam String order) {
-        return readDriverProfileService.readDriverProfilesByDriverStatus(status, orderBy, order);
+    @GetMapping(params = "status")
+    public DataPackageDto findAllByDriverStatus(@RequestParam String status,
+                                                @RequestParam int page,
+                                                @RequestParam int size,
+                                                @RequestParam String orderBy,
+                                                @RequestParam String direction) {
+        return readDriverProfileService.readDriverProfilesByDriverStatus(status, page, size, orderBy, direction);
     }
-    @GetMapping("/read-fare-by-driver-id/{id}")
+    @GetMapping("/{id}/fare")
     public FareType findFareTypeByDriverId(@PathVariable Long id) {
         return readDriverProfileService.readDriverProfileFareTypeById(id);
     }
-    @GetMapping("/read-status-by-driver-id/{id}")
+    @GetMapping("/{id}/status")
     public DriverStatus findDriverStatusByDriverId(@PathVariable Long id) {
         return readDriverProfileService.readDriverProfileStatusById(id);
     }
-    @GetMapping("/read-rating-by-driver-id/{id}")
+    @GetMapping("/{id}/rating")
     public Byte findRatingByDriverId(@PathVariable Long id) {
         return readDriverProfileService.readDriverProfileRatingById(id);
     }
-    @GetMapping("/read-all-by-rate")
-    public List<ProfileDto> findAllByDriverStatus(@RequestParam Byte rate,
-                                                  @RequestParam String orderBy,
-                                                  @RequestParam String order) {
-        return readDriverProfileService.readDriverProfilesByRate(rate, orderBy, order);
-    }
-
 }
