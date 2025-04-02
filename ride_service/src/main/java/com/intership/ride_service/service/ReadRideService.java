@@ -1,14 +1,14 @@
 package com.intership.ride_service.service;
 
+import com.intership.ride_service.config.exception.ResourceNotFoundException;
 import com.intership.ride_service.dto.PromoCodeDto;
 import com.intership.ride_service.dto.PromoCodePackageDto;
 import com.intership.ride_service.dto.RideDto;
-import com.intership.ride_service.dto.RidePackageDto;
+import com.intership.ride_service.dto.transfer_objects.RideFilterRequest;
+import com.intership.ride_service.dto.transfer_objects.RidePackageDto;
 import com.intership.ride_service.dto.mappers.PromoCodeMapper;
 import com.intership.ride_service.dto.mappers.RideMapper;
 import com.intership.ride_service.entity.Ride;
-import com.intership.ride_service.entity.enums.FareType;
-import com.intership.ride_service.entity.enums.RideStatus;
 import com.intership.ride_service.repo.RideRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,46 +16,36 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 @Service
 @RequiredArgsConstructor
 public class ReadRideService {
 
+    private final MongoTemplate mongoTemplate;
     private final RideRepo rideRepo;
+
+    public RidePackageDto getAllRides(RideFilterRequest filterRequest) {
+        Query query = buildQuery(filterRequest);
+        query.with(createPageableObject(filterRequest));
+
+        List<RideDto> rides = mongoTemplate.find(query, Ride.class)
+                .stream()
+                .map(RideMapper.converter::handleEntity)
+                .toList();
+        long totalElements = mongoTemplate.count(query, Ride.class);
+
+        return createRidePackage(rides, totalElements, filterRequest);
+    }
 
     public RideDto getRideById(String id) {
         Ride ride = rideRepo
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Ride not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ride.notFound"));
         return RideMapper.converter.handleEntity(ride);
-    }
-
-    public RidePackageDto getAllRidesByDate(LocalDate date, int page, int size,String sortBy, String direction) {
-        Page<Ride> rides = rideRepo.findByDate(date, createPageableObject(page, size, sortBy, direction));
-        return createRidePackage(rides);
-    }
-
-    public RidePackageDto getAllRidesByDriver(Long driverId, int page, int size,String sortBy, String order) {
-        Page<Ride> rides = rideRepo.findByDriverDriverId(driverId, createPageableObject(page, size, sortBy, order));
-        return createRidePackage(rides);
-    }
-
-    public RidePackageDto getAllRidesByPassenger(Long passengerId, int page, int size,String sortBy, String order) {
-        Page<Ride> rides = rideRepo.findByPassengerPassengerId(passengerId, createPageableObject(page, size, sortBy, order));
-        return createRidePackage(rides);
-    }
-
-    public RidePackageDto getAllRidesByStatus(RideStatus status, int page, int size, String sortBy, String order) {
-        Page<Ride> rides = rideRepo.findByStatus(status, createPageableObject(page, size, sortBy, order));
-        return createRidePackage(rides);
-    }
-
-    public RidePackageDto getAllRidesByFareType(FareType fareType,int page, int size, String sortBy, String order) {
-        Page<Ride> rides = rideRepo.findByDriverFareType(fareType, createPageableObject(page, size, sortBy, order));
-        return createRidePackage(rides);
     }
 
     public PromoCodePackageDto getUsedPromoCodes(int page, int size, String sortBy, String order) {
@@ -72,22 +62,43 @@ public class ReadRideService {
                 rides.getTotalPages()
         );
     }
+    private Query buildQuery(RideFilterRequest filterRequest) {
+        Criteria criteria = new Criteria();
 
+        if (filterRequest.date() != null) {
+            criteria.and("date").is(filterRequest.date());
+        }
+        if (filterRequest.driverId() != null) {
+            criteria.and("driver.driverId").is(filterRequest.driverId());
+        }
+        if (filterRequest.passengerId() != null) {
+            criteria.and("passenger.passengerId").is(filterRequest.passengerId());
+        }
+        if (filterRequest.status() != null) {
+            criteria.and("status").is(filterRequest.status());
+        }
+        if (filterRequest.fareType() != null) {
+            criteria.and("driver.fareType").is(filterRequest.fareType());
+        }
+
+        return new Query(criteria);
+    }
+
+    private Pageable createPageableObject(RideFilterRequest filterRequest) {
+        Sort sort = Sort.by(Sort.Direction.fromString(filterRequest.order()), filterRequest.sortBy());
+        return PageRequest.of(filterRequest.page(), filterRequest.size(), sort);
+    }
     public Pageable createPageableObject(int page, int size, String orderBy, String direction) {
         Sort sort = Sort.by(Sort.Direction.fromString(direction), orderBy);
         return PageRequest.of(page, size, sort);
     }
-    public RidePackageDto createRidePackage(Page<Ride> rides) {
-        List<RideDto> ridesDto = rides.getContent()
-                .stream()
-                .map(RideMapper.converter::handleEntity)
-                .toList();
+    public RidePackageDto createRidePackage(List<RideDto> rides, long totalElements, RideFilterRequest filterRequest) {
         return new RidePackageDto(
-                ridesDto,
-                rides.getTotalElements(),
-                rides.getNumber(),
-                rides.getSize(),
-                rides.getTotalPages()
+                rides,
+                totalElements,
+                filterRequest.page(),
+                rides.size(),
+                (int) Math.ceil((double) totalElements / filterRequest.size())
         );
     }
 }

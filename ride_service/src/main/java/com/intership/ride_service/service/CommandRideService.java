@@ -1,5 +1,7 @@
 package com.intership.ride_service.service;
 
+import com.intership.ride_service.config.exception.InvalidInputException;
+import com.intership.ride_service.config.exception.ResourceNotFoundException;
 import com.intership.ride_service.dto.RideDto;
 import com.intership.ride_service.dto.mappers.RideMapper;
 import com.intership.ride_service.entity.Ride;
@@ -21,16 +23,17 @@ public class CommandRideService {
     @Transactional
     public RideDto updateRide(RideDto updatedRideDto) {
         if (updatedRideDto.id() == null) {
-            throw new IllegalArgumentException("Ride ID must not be null");
+            throw new InvalidInputException("ride.id.notNull");
         }
         Ride existingRide = rideRepo
                 .findById(updatedRideDto.id())
-                .orElseThrow(() -> new RuntimeException("Ride not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ride.notFound"));
         RideMapper.converter.updateRideFromDto(updatedRideDto, existingRide);
         return RideMapper.converter.handleEntity( rideRepo.save(existingRide));
     }
     @Transactional
     public void deleteRide(String rideId) {
+        if (!rideRepo.existsById(rideId)) throw new ResourceNotFoundException("ride.notFound");
         rideRepo.deleteById(rideId);
     }
 }

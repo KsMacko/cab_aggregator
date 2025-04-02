@@ -1,4 +1,6 @@
-package com.intership.ride_service.dto;
+package com.intership.ride_service.dto.transfer_objects;
+
+import com.intership.ride_service.dto.RideDto;
 
 import java.util.List;
 

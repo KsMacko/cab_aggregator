@@ -1,7 +1,9 @@
 package com.intership.ride_service.controller;
 
+import com.intership.ride_service.controller.doc.CommandDoc;
 import com.intership.ride_service.dto.RideDto;
 import com.intership.ride_service.service.CommandRideService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,10 +20,10 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/v1/rides")
 @RequiredArgsConstructor
-public class CommandRideController {
+public class CommandRideController implements CommandDoc{
     private final CommandRideService commandRideService;
-    @PostMapping
-    public ResponseEntity<RideDto> createPassenger(@RequestBody RideDto rideDto) {
+    @Override
+    public ResponseEntity<RideDto> createPassenger(@Valid  @RequestBody RideDto rideDto) {
         RideDto createdProfile =  commandRideService.createRide(rideDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -32,12 +34,13 @@ public class CommandRideController {
                 .created(location)
                 .body(createdProfile);
     }
-    @DeleteMapping
-    public void deleteRide(@RequestParam String id) {
+    @Override
+    public ResponseEntity<Void> deleteRide(@RequestParam String id) {
         commandRideService.deleteRide(id);
+        return ResponseEntity.noContent().build();
     }
-    @PutMapping
-    public RideDto updateRide(@RequestBody RideDto ride) {
+    @Override
+    public RideDto updateRide( @Valid @RequestBody RideDto ride) {
         return commandRideService.updateRide(ride);
     }
 }
