@@ -1,15 +1,14 @@
-package com.intership.ride_service.config;
+package com.intership.ride_service.config.exception;
 
 
-import com.intership.ride_service.config.exception.BaseExceptionDto;
-import com.intership.ride_service.config.exception.BaseValidationException;
-import com.intership.ride_service.config.exception.InvalidInputException;
-import com.intership.ride_service.config.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 
 @RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
@@ -50,5 +50,13 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 null,
                 LocaleContextHolder.getLocale())), HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(messageSource.getMessage(
+                        "error.notReadable",
+                        null,
+                        LocaleContextHolder.getLocale()));
     }
 }

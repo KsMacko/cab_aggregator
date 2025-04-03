@@ -6,6 +6,7 @@ import com.intership.ride_service.service.CommandRideService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,7 +24,7 @@ import java.net.URI;
 public class CommandRideController implements CommandDoc{
     private final CommandRideService commandRideService;
     @Override
-    public ResponseEntity<RideDto> createPassenger(@Valid  @RequestBody RideDto rideDto) {
+    public ResponseEntity<RideDto> createPassenger(@Valid @RequestBody RideDto rideDto) {
         RideDto createdProfile =  commandRideService.createRide(rideDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -40,7 +41,7 @@ public class CommandRideController implements CommandDoc{
         return ResponseEntity.noContent().build();
     }
     @Override
-    public RideDto updateRide( @Valid @RequestBody RideDto ride) {
+    public RideDto updateRide(@Valid @RequestBody RideDto ride) {
         return commandRideService.updateRide(ride);
     }
 }

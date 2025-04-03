@@ -39,6 +39,7 @@ public interface CommandDoc {
     @PostMapping
     ResponseEntity<RideDto> createPassenger(
             @Parameter(description = "Ride data to create", required = true)
+            @Valid
             @RequestBody RideDto rideDto);
 
     @Operation(

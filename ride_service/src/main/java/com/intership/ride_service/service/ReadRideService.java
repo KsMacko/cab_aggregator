@@ -20,6 +20,7 @@ import java.util.List;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class ReadRideService {
     private final MongoTemplate mongoTemplate;
     private final RideRepo rideRepo;
 
+    @Transactional(readOnly= true)
     public RidePackageDto getAllRides(RideFilterRequest filterRequest) {
         Query query = buildQuery(filterRequest);
         query.with(createPageableObject(filterRequest));
@@ -41,13 +43,14 @@ public class ReadRideService {
         return createRidePackage(rides, totalElements, filterRequest);
     }
 
+    @Transactional(readOnly= true)
     public RideDto getRideById(String id) {
         Ride ride = rideRepo
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ride.notFound"));
         return RideMapper.converter.handleEntity(ride);
     }
-
+    @Transactional(readOnly= true)
     public PromoCodePackageDto getUsedPromoCodes(int page, int size, String sortBy, String order) {
         Page<Ride> rides = rideRepo.findByPromoCodeIsNotNull(createPageableObject(page, size, sortBy, order));
         List<PromoCodeDto> promoCodesDto = rides.getContent()
