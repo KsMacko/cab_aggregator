@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface PassengerProfileRepo extends JpaRepository<PassengerProfile, Long> {
     @Query("select p from PassengerProfile p join p.rates r group by p.profileId having floor(avg(r.value))=:rate")
     Page<PassengerProfile> findPassengerProfileByRate(Byte rate, Pageable pageable);
-    Optional<PassengerProfile> findByEmail(String email);
-    Optional<PassengerProfile> findByPhone(String phone);
+    Page<PassengerProfile> findByEmail(String email, Pageable pageable);
+    Page<PassengerProfile> findByPhone(String phone, Pageable pageable);
     @Query("SELECT p.activatedPromoCodeId FROM PassengerProfile p WHERE p.profileId = :passengerId")
     Optional<Long> findActivatedPromoCodeIdByPassenger(@Param("passengerId") Long passengerId);
 }

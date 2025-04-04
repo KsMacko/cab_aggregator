@@ -1,5 +1,6 @@
 package com.intership.passenger_service.controller;
 
+import com.intership.passenger_service.controller.doc.CommandDoc;
 import com.intership.passenger_service.dto.ProfileDto;
 import com.intership.passenger_service.service.CommandPassengerProfileService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ import java.net.URI;
 @RestController
 @RequestMapping("api/v1/passengers")
 @RequiredArgsConstructor
-public class CommandPassengerController {
+public class CommandPassengerController implements CommandDoc {
     private final CommandPassengerProfileService profileService;
-
+    @Override
     @PostMapping
     public ResponseEntity<ProfileDto> createPassenger(@RequestBody ProfileDto profileDto) {
         ProfileDto createdProfile = profileService.createNewPassengerProfile(profileDto);
@@ -33,10 +34,12 @@ public class CommandPassengerController {
                 .created(location)
                 .body(createdProfile);
     }
+    @Override
     @PutMapping
     public ProfileDto updatePassenger(@RequestBody ProfileDto profileDto) {
         return profileService.updatePassengerProfile(profileDto);
     }
+    @Override
     @DeleteMapping("/{id}")
     public void deletePassenger(@PathVariable Long id) {
         profileService.deletePassengerProfile(id);

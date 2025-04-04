@@ -1,7 +1,6 @@
 package com.intership.passenger_service.config;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.parser.OpenAPIV3Parser;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,8 +8,10 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI customOpenAPI() {
-        String yamlFilePath = getClass().getClassLoader().getResource("openapi.yaml").toString();
-        return new OpenAPIV3Parser().read(yamlFilePath);
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("passenger_service")
+                .pathsToMatch("/api/**")
+                .build();
     }
 }
