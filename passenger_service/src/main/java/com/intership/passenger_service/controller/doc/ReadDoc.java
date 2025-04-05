@@ -2,9 +2,9 @@ package com.intership.passenger_service.controller.doc;
 
 import com.intership.passenger_service.config.exception.BaseException;
 import com.intership.passenger_service.config.exception.BaseValidationException;
-import com.intership.passenger_service.dto.DataPackageDto;
+import com.intership.passenger_service.dto.transfer_objects.DataPackageDto;
 import com.intership.passenger_service.dto.ProfileDto;
-import com.intership.passenger_service.dto.ProfileFilterRequest;
+import com.intership.passenger_service.dto.transfer_objects.ProfileFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

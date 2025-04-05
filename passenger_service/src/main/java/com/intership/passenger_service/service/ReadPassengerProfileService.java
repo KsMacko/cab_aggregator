@@ -2,9 +2,9 @@ package com.intership.passenger_service.service;
 
 import com.intership.passenger_service.config.exception.InvalidInputException;
 import com.intership.passenger_service.config.exception.ResourceNotFound;
-import com.intership.passenger_service.dto.DataPackageDto;
+import com.intership.passenger_service.dto.transfer_objects.DataPackageDto;
 import com.intership.passenger_service.dto.ProfileDto;
-import com.intership.passenger_service.dto.ProfileFilterRequest;
+import com.intership.passenger_service.dto.transfer_objects.ProfileFilterRequest;
 import com.intership.passenger_service.dto.mapper.ProfileMapper;
 import com.intership.passenger_service.entity.PassengerProfile;
 import com.intership.passenger_service.repo.PassengerProfileRepo;
@@ -37,7 +37,11 @@ public class ReadPassengerProfileService {
 
     @Transactional(readOnly= true)
     public DataPackageDto readPassengerProfiles(ProfileFilterRequest filter) {
-        Pageable pageable = createPageableObject(filter.sortBy(), filter.order(), filter.page(), filter.size());
+        Pageable pageable = createPageableObject(
+                filter.sortBy().getFieldName(),
+                filter.order().toString(),
+                filter.page(),
+                filter.size());
 
         if (filter.email() != null) {
             return convertToDataPackageDto(passengerProfileRepo.findByEmail(filter.email(), pageable));

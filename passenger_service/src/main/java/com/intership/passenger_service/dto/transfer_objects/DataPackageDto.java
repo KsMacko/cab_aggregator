@@ -1,5 +1,7 @@
-package com.intership.passenger_service.dto;
+package com.intership.passenger_service.dto.transfer_objects;
 
+
+import com.intership.passenger_service.dto.ProfileDto;
 
 import java.util.List;
 

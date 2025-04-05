@@ -1,6 +1,8 @@
-package com.intership.passenger_service.dto;
+package com.intership.passenger_service.dto.transfer_objects;
 
 import com.intership.passenger_service.config.ValidationConstants;
+import com.intership.passenger_service.enums.FieldsToSort;
+import com.intership.passenger_service.enums.OrderDirection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -25,7 +27,7 @@ public record ProfileFilterRequest (
         @Schema(description = "Number of items per page", example = "10", required = true)
         int size,
         @Schema(description = "Field to sort by", example = "firstName", required = true)
-        String sortBy,
+        FieldsToSort sortBy,
         @Schema(description = "Sort order (ASC or DESC)", example = "DESC", required = true)
-        String order
+        OrderDirection order
 ){ }
