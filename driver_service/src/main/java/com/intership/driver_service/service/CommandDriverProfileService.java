@@ -1,7 +1,10 @@
 package com.intership.driver_service.service;
 
+import com.intership.driver_service.config.exception.InvalidInputException;
+import com.intership.driver_service.config.exception.ResourceNotFoundException;
 import com.intership.driver_service.dto.ProfileDto;
 import com.intership.driver_service.dto.mapper.ProfileMapper;
+import com.intership.driver_service.entity.DriverAccount;
 import com.intership.driver_service.entity.DriverProfile;
 import com.intership.driver_service.repo.DriverAccountRepo;
 import com.intership.driver_service.repo.DriverProfileRepo;
@@ -17,25 +20,34 @@ public class CommandDriverProfileService {
 
     @Transactional
     public ProfileDto createProfile(ProfileDto profileDto) {
-        DriverProfile driverProfile = driverProfileRepo.save(ProfileMapper.converter.handleDto(profileDto));
-        return ProfileMapper.converter.handleEntity(driverProfile);
+        DriverProfile driverProfile = ProfileMapper.converter.handleDto(profileDto);
+        DriverAccount driverAccount = driverAccountRepo.findById(profileDto.profileId())
+                .orElseThrow(()->new ResourceNotFoundException("driver.account.notExists"));
+        driverProfile.setDriverAccount(driverAccount);
+        driverProfile.setProfileId(null);
+        driverAccount.setDriverProfile(driverProfile);
+        return ProfileMapper.converter.handleEntity(driverProfileRepo.save(driverProfile));
     }
     @Transactional
     public ProfileDto updateDriverProfile(ProfileDto profileDto) {
         if (profileDto.profileId() == null) {
-            throw new IllegalArgumentException("Profile ID must not be null");
+            throw new InvalidInputException("driver.id.notNull");
         }
         DriverProfile existingProfile = driverProfileRepo
                 .findById(profileDto.profileId())
-                .orElseThrow(() -> new RuntimeException("Driver not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("driver.notFound"));
         ProfileMapper.converter.updateProfileFromDto(profileDto, existingProfile);
 
         return ProfileMapper.converter.handleEntity( driverProfileRepo.save(existingProfile));
     }
     @Transactional
     public void deleteDriverProfile(Long profileId) {
-        driverAccountRepo.deleteById(profileId);
+        if(profileId == null)
+            throw new InvalidInputException("driver.id.notNull");
+        if(!driverProfileRepo.existsById(profileId))
+            throw new ResourceNotFoundException("driver.notFound");
         driverProfileRepo.deleteById(profileId);
+        driverAccountRepo.deleteById(profileId);
     }
 
 
