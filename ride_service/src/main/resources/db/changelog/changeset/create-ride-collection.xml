@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/mongodb
+        https://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
+
+    <changeSet id="createCollectionExample" author="yourname">
+        <mongodb:createCollection collectionName="myCollection">
+            <mongodb:options>
+                {
+                "validator": {
+                "$jsonSchema": {
+                "bsonType": "object",
+                "required": ["name", "address"],
+                "properties": {
+                "name": {
+                "bsonType": "string",
+                "description": "The Name"
+                },
+                "address": {
+                "bsonType": "string",
+                "description": "The Address"
+                }
+                }
+                }
+                },
+                "validationAction": "warn",
+                "validationLevel": "strict"
+                }
+            </mongodb:options>
+        </mongodb:createCollection>
+    </changeSet>
+</databaseChangeLog>
