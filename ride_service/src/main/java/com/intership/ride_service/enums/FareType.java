@@ -1,4 +1,4 @@
-package com.intership.ride_service.entity.enums;
+package com.intership.ride_service.enums;
 
 public enum FareType {
     ECONOMY, COMFORT, BUSINESS;

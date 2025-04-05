@@ -4,7 +4,7 @@ import com.intership.ride_service.dto.validators.annotations.ValidateDriver;
 import com.intership.ride_service.dto.validators.annotations.ValidateLocationList;
 import com.intership.ride_service.dto.validators.annotations.ValidatePassenger;
 import com.intership.ride_service.dto.validators.annotations.ValidatePromoCode;
-import com.intership.ride_service.entity.enums.RideStatus;
+import com.intership.ride_service.enums.RideStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

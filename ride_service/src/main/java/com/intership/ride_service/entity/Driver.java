@@ -1,6 +1,6 @@
 package com.intership.ride_service.entity;
 
-import com.intership.ride_service.entity.enums.FareType;
+import com.intership.ride_service.enums.FareType;
 import lombok.Getter;
 import lombok.Setter;
 

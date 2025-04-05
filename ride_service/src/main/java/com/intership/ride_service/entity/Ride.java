@@ -1,7 +1,7 @@
 package com.intership.ride_service.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.intership.ride_service.entity.enums.RideStatus;
+import com.intership.ride_service.enums.RideStatus;
 import com.mongodb.lang.Nullable;
 import lombok.Getter;
 import lombok.Setter;

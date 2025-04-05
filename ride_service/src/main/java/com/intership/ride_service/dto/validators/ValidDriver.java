@@ -3,7 +3,7 @@ package com.intership.ride_service.dto.validators;
 import com.intership.ride_service.config.constants.ValidationConstants;
 import com.intership.ride_service.dto.DriverDto;
 import com.intership.ride_service.dto.validators.annotations.ValidateDriver;
-import com.intership.ride_service.entity.enums.FareType;
+import com.intership.ride_service.enums.FareType;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

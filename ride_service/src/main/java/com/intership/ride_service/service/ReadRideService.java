@@ -88,7 +88,9 @@ public class ReadRideService {
     }
 
     private Pageable createPageableObject(RideFilterRequest filterRequest) {
-        Sort sort = Sort.by(Sort.Direction.fromString(filterRequest.order()), filterRequest.sortBy());
+        Sort sort = Sort.by(Sort.Direction.fromString(
+                filterRequest.order().toString()),
+                filterRequest.sortBy().getFieldName());
         return PageRequest.of(filterRequest.page(), filterRequest.size(), sort);
     }
     public Pageable createPageableObject(int page, int size, String orderBy, String direction) {

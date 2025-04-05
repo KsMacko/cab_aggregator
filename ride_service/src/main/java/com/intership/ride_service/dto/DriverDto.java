@@ -1,6 +1,6 @@
 package com.intership.ride_service.dto;
 
-import com.intership.ride_service.entity.enums.FareType;
+import com.intership.ride_service.enums.FareType;
 
 public record DriverDto (
         Long driverId,
